@@ -1,69 +1,120 @@
-	var app = angular.module("MyApp",[]);
-	app.controller( "TODOListCtrl" , function ($scope) {
+var app = angular.module("MyApp",[]);
+app.controller( "TODOListCtrl", function ($scope, ctrlService) {
+
+$scope.tasks = ctrlService.list();
+
+$scope.filterOptions = { 
+	filters:[
+	{id: 1,name:"Show All"},
+	{id: 2,name:"Checked"},
+	{id: 3,name:"Unchecked"}
+	]
+	};
+
+	$scope.filterItem = {
+
+		filter: $scope.filterOptions.filters[0]
+	}
+
+
+
+	$scope.customFilter = function (tasks){
+
+		if ($scope.filterItem.filter.id===1){
+
+			return true;
+		}
+
+		else if(tasks.isChecked===true && $scope.filterItem.filter.id===2){
+
+			return true;
+		}
+
+		else if (tasks.isChecked===false && $scope.filterItem.filter.id===3){
+
+			return true;
+		}
+	};
+
+	var x=3; 
+
+	$scope.addToList = function (){
+
+		//console.log(itemName);
 		
-		$scope.tasks = [
-		{ name: "Milestone #1", id: 0, isChecked: true  }, 
-		{ name: "Milestone #2", id: 1, isChecked: true  }, 
-		{ name: "Milestone #3", id: 2, isChecked: true },
-		{ name: "Milestone #4", id: 3, isChecked: false }
+		if ($scope.itemName!==""){
+			ctrlService.insert($scope.itemName);
+		}
+		else{
+			alert("no data!");
+		}
 
-		];
-
-		$scope.filterOptions = { 
-			filters:[
-			{id: 1,name:"Show All"},
-			{id: 2,name:"Checked"},
-			{id: 3,name:"Unchecked"}
-			]};
-
-			$scope.filterItem = {
-				filter: $scope.filterOptions.filters[0]
-			}
+		$scope.itemName="";
+	};
 
 
+	$scope.remove = function (){
+		
+        task=this;
+		ctrlService.delete(task);
+	};
 
-			$scope.customFilter = function (tasks)
-			{
+	$scope.onEnterAdd = function (event) {
 
-				if ($scope.filterItem.filter.id===1)
-					return true;
-				else if(tasks.isChecked===true && $scope.filterItem.filter.id===2)
-					return true;
-				else if (tasks.isChecked===false && $scope.filterItem.filter.id===3)
-					return true;
-			};
+		if (event.keyCode === 13){
+			$scope.addToList();
+		}
+	};	
 
-			$scope.updateName = function(task, newName){
-				task.name = newName;
-			}; 
+	$scope.onEnterUpdate = function (event, task, newName){
 
-			var x=3; 
+		if (event.keyCode === 13){
+			
+			$scope.updateName(task, newName);
+			return true;
+		}
+		else{ 
+			return false;
+		}	
+	};
 
-			$scope.AddToList = function ()
+	$scope.updateName = function(task, newName){
 
-			{
+		ctrlService.edit(task, newName);
+	}; 
+});
 
+app.factory('ctrlService', function(){
 
-				if ($scope.itemName!==""){
-					$scope.tasks.push({name:$scope.itemName, id:x++,isChecked:false});
-				}
-				else{
-					alert("no data!");
-				}
+	var tasks = [{ name: "Milestone #1", id: 0, isChecked: true  }, 
+			{ name: "Milestone #2", id: 1, isChecked: true  }, 
+			{ name: "Milestone #3", id: 2, isChecked: true  },
+			{ name: "Milestone #4", id: 3, isChecked: true  }];
 
-				$scope.itemName="";
-			};
+		return {
 
-			$scope.Remove = function (task)
+    	list: function(){
+    		return tasks;
+    	},
 
-			{
-				$scope.tasks.splice(this.$index,1);
-			};
+    	insert: function(itemName){
+    			
+    			tasks.push({
+    				name: itemName, isChecked:false
+    			});
+    			
+    	},
 
-			$scope.myFunct = function (event) 
-			{
-				if (event.keyCode === 13){
-					$scope.AddToList();
-				}
-			};
-		});
+    	delete: function(task){
+    			
+				tasks.splice(task.$index, 1);    		
+    	},
+
+    	edit: function(task, newName){
+   
+    			task.name=newName;
+    	}
+
+    }
+
+ });

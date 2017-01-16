@@ -21,13 +21,14 @@
 		}
 
 	</style>
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
 	<script src="controller.js"></script>
 </head>
 
 <body  ng-controller="TODOListCtrl">
-	<div>Add New Items: <input type="text" ng-model="itemName" placeholder="Enter a new Item" ng-keydown="myFunct($event)"/>&nbsp;
-	<button type="button" ng-click="AddToList()" >Add to List</button>
+	<div>Add New Items: <input type="text" ng-model="itemName" placeholder="Enter a new Item"
+		ng-keydown="onEnterAdd($event)" autofocus/>&nbsp;
+		<button type="button" ng-click="addToList()" >Add to List</button>
 
 	</div><br>
 	TO-DO:
@@ -38,9 +39,12 @@
 			<label>
 				<input type="checkbox" ng-model="task.isChecked" />
 				<span>{{task.name}}</span>&nbsp;
-				<button type="button" ng-click="Remove(task)" >Remove</button>
-				<button type="button" ng-show="!flag" ng-click="newName=task.name; flag=true">Edit</button>
-				<div ng-show="flag" ><input type="text" ng-model="newName"> <input type="button" value="Update" ng-click="updateName(task, newName); flag = false;"></div>
+				<button type="button" ng-click="remove()" >Remove</button>
+				<button type="button" ng-show="!showEdit" ng-click="newName=task.name; showEdit=true">Edit</button>
+				<div ng-show="showEdit" >
+					<input type="text" ng-model="newName" ng-keyup="onEnterUpdate($event,task,newName)?showEdit=false:showEdit=true;" autofocus/>
+					<input type="button" value="Update" ng-click="updateName(task, newName); showEdit = false;"/>
+				</div>
 			</label>
 		</div>
 	</div>
