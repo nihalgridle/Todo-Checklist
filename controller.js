@@ -1,7 +1,14 @@
 var app = angular.module("MyApp",[]);
-app.controller( "TODOListCtrl", function ($scope, ctrlService) {
+app.controller( "TODOListCtrl", function ($scope, todoService) {
 
-$scope.tasks = ctrlService.list();
+
+
+
+$scope.tasks = todoService.list();
+
+//localStorage.setItem('tasks', JSON.stringify($scope.tasks));
+
+//$scope.tasks = todoService.list();
 
 $scope.filterOptions = { 
 	filters:[
@@ -43,20 +50,21 @@ $scope.filterOptions = {
 		//console.log(itemName);
 		
 		if ($scope.itemName!==""){
-			ctrlService.insert($scope.itemName);
+			todoService.insert($scope.itemName);
 		}
 		else{
 			alert("no data!");
 		}
 
 		$scope.itemName="";
+
 	};
 
 
 	$scope.remove = function (){
 		
         task=this;
-		ctrlService.delete(task);
+		todoService.delete(task);
 	};
 
 	$scope.onEnterAdd = function (event) {
@@ -80,18 +88,22 @@ $scope.filterOptions = {
 
 	$scope.updateName = function(task, newName){
 
-		ctrlService.edit(task, newName);
+		todoService.edit(task, newName);
 	}; 
 });
 
-app.factory('ctrlService', function(){
+app.factory('todoService', function(){
 
-	var tasks = [{ name: "Milestone #1", id: 0, isChecked: true  }, 
+	var saved = localStorage.getItem('tasks');
+
+	//var x=3;
+	var tasks = (localStorage.getItem('tasks')!==null) ? JSON.parse(saved) :  [{ name: "Milestone #1", id: 0, isChecked: true  }, 
 			{ name: "Milestone #2", id: 1, isChecked: true  }, 
 			{ name: "Milestone #3", id: 2, isChecked: true  },
-			{ name: "Milestone #4", id: 3, isChecked: true  }];
+			{ name: "Milestone #4", id: 3, isChecked: true  }];		
 
 		return {
+
 
     	list: function(){
     		return tasks;
@@ -102,17 +114,21 @@ app.factory('ctrlService', function(){
     			tasks.push({
     				name: itemName, isChecked:false
     			});
+    			//_saveToLocalStorage(tasks);
+    			localStorage.setItem('tasks', JSON.stringify(tasks));
     			
     	},
 
     	delete: function(task){
     			
-				tasks.splice(task.$index, 1);    		
+				tasks.splice(task.$index, 1);
+				localStorage.setItem('tasks', JSON.stringify(tasks));   		
     	},
 
     	edit: function(task, newName){
    
     			task.name=newName;
+    			localStorage.setItem('tasks', JSON.stringify(tasks));
     	}
 
     }
